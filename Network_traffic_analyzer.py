@@ -136,6 +136,17 @@ def plot_protocol_distribution(protocol_counts):
     plt.grid(axis="y", linestyle="--", alpha=0.7)
     plt.show()
 
+def plot_top_ip_communications(ip_communication_table):
+    top_10 = ip_communication_table.head(10)  # Take top 10
+    plt.figure(figsize=(12, 6))
+    plt.barh(top_10["Source IP"] + " → " + top_10["Destination IP"], top_10[0], color='orange')
+    plt.xlabel("Packet Count")
+    plt.ylabel("IP Communication Pairs")
+    plt.title("Top 10 IP Address Communications")
+    plt.gca().invert_yaxis()  # Flip to show highest first
+    plt.grid(axis="x", linestyle="--", alpha=0.7)
+    plt.show()
+
 # Function to plot the share of protocols between IPs
 def plot_share_of_protocols_between_ips(ip_communication_protocols):
     plt.figure(figsize=(12, 6))
@@ -164,6 +175,11 @@ def main(pcap_file,port_scan_threshold):
     total_bandwidth, protocol_counts, ip_communication_table, protocol_frequency, ip_communication_protocols = analyze_packet_data(df)
     #latency_df = calculate_latency(packets)
     print_results(total_bandwidth, protocol_counts, ip_communication_table, protocol_frequency, ip_communication_protocols)
+
+    plot_protocol_distribution(protocol_counts)
+    plot_top_ip_communications(ip_communication_table)
+    plot_share_of_protocols_between_ips(ip_communication_protocols)
+
     df = extract_packet_data_security(packets)
     
     detect_port_scanning(df,port_scan_threshold)
