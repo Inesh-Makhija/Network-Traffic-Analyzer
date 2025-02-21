@@ -61,10 +61,17 @@ def analyze_packet_data(df):
     ip_communication_protocols.columns = ["Source IP", "Destination IP", "Protocol", "Count"]
     ip_communication_protocols["Protocol"] = ip_communication_protocols["Protocol"].apply(protocol_name)
 
+    # Debugging: Check DataFrame before transformation
+    print("Before GroupBy:", ip_communication_protocols.head())
 
-    ip_communication_protocols["Percentage"] = ip_communication_protocols.groupby(["Source IP", "Destination IP"])["Count"].apply(lambda x: x / x.sum() * 100)
+    # Apply fix: Using `transform()` instead of `apply()`
+    ip_communication_protocols["Percentage"] = ip_communication_protocols.groupby(["Source IP", "Destination IP"])["Count"].transform(lambda x: x / x.sum() * 100)
+
+    # Debugging: Check DataFrame after transformation
+    print("After GroupBy:", ip_communication_protocols.head())
 
     return total_bandwidth, protocol_counts_df, ip_communication_table, protocol_frequency, ip_communication_protocols
+
 
 def extract_packet_data_security(packets):
     packet_data = []
