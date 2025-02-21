@@ -1,6 +1,6 @@
 import sys
 import logging
-from scapy.all import *
+from scapy.all import IP, TCP, rdpcap, Scapy_Exception
 import pandas as pd
 from tabulate import tabulate
 from tqdm import tqdm
@@ -117,6 +117,34 @@ def print_results(total_bandwidth, protocol_counts_df, ip_communication_table, p
 
     logger.info("\nShare of each protocol between IPs:\n")
     logger.info(tabulate(ip_communication_protocols, headers=["Source IP", "Destination IP", "Protocol", "Count", "Percentage"], tablefmt="grid", floatfmt=".2f"))
+
+    # Function to plot protocol distribution
+def plot_protocol_distribution(protocol_counts):
+    plt.figure(figsize=(10, 5))
+    protocol_counts.set_index("Protocol")["Percentage"].plot(kind="bar", color="skyblue", edgecolor="black")
+    plt.xlabel("Protocol")
+    plt.ylabel("Percentage (%)")
+    plt.title("Protocol Distribution in Network Traffic")
+    plt.xticks(rotation=45)
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.show()
+
+# Function to plot the share of protocols between IPs
+def plot_share_of_protocols_between_ips(ip_communication_protocols):
+    plt.figure(figsize=(12, 6))
+    
+    for proto in ip_communication_protocols["Protocol"].unique():
+        subset = ip_communication_protocols[ip_communication_protocols["Protocol"] == proto]
+        plt.scatter(subset["Source IP"], subset["Percentage"], label=proto)
+
+    plt.xlabel("Source IP")
+    plt.ylabel("Percentage Share of Protocols")
+    plt.title("Share of Each Protocol Between IPs")
+    plt.xticks(rotation=90)
+    plt.legend()
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.show()
+
 
 def plot_all_graphs(protocol_counts, ip_communication_protocols):
     plot_protocol_distribution(protocol_counts)
